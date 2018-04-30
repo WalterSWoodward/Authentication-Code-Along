@@ -8,6 +8,11 @@ const server = express();
 // move into the middleware.js file  
 const setupMiddleware = require('./setup/middleware')(server);
 
+const setupRoutes = require('./setup/routes')(server);
+
+// remember you can check if mongo is running by typing `mongo` in the terminal, and typing `show dbs`
+// You could seperate this into its own file called 'connect2mongodb', similar to what we did above
+// with the middleware if you wanted.
 mongoose
   .connect('mongodb://localhost/auth')
   .then(cnn => {
@@ -17,9 +22,7 @@ mongoose
     console.log('\n=== ERROR connecting to mongo ===\n');
   });
 
-server.get('/', function(req, res) {
-  res.send({ api: 'up and running' });
-});
+
 
 server.listen(5000, () => console.log('\n=== API on port 5k ===\n'));
 
