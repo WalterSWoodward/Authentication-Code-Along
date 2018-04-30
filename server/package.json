@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description":
     "Code and comments from code along with Luis, \"End to End\" 4 hour lecture",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon server.js"
   },
   "repository": {
     "type": "git",
@@ -19,5 +19,8 @@
     "url": "https://github.com/WalterSWoodward/Authentication-Code-Along/issues"
   },
   "homepage":
-    "https://github.com/WalterSWoodward/Authentication-Code-Along#readme"
+    "https://github.com/WalterSWoodward/Authentication-Code-Along#readme",
+  "devDependencies": {
+    "nodemon": "^1.17.3"
+  }
 }
