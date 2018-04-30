@@ -5,8 +5,10 @@ const cors = require('cors');
 
 const server = express();
 // This middleware needs to know about the server.  The middleware we create, we are going to
-// move into the middleware.js file  
-const setupMiddleware = require('./setup/middleware')(server);
+// move into the middleware.js file
+// This is really short hand for two things. Giving server.js access to middleware.js AND
+// then passing server into setupMiddleware -- ex. setupMiddleware(server); on a second line.
+const setupMiddleware = require('./setup/middleware')(server); 
 
 const setupRoutes = require('./setup/routes')(server);
 
