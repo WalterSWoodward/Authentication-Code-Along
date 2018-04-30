@@ -11,7 +11,7 @@ module.exports = function(server) {
     const credentials = req.body;
     // add user to database
     const user = new User(credentials);
-    user.save().then(inserted => {
+    user.save().then(inserted => { 
       res.status(201).json(inserted);
     });
   });
