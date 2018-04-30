@@ -1,10 +1,12 @@
 const express = require('express');
-const morgan = require('morgan');
-const helmet = require('helmet');
+
 const mongoose = require('mongoose');
 const cors = require('cors');
 
 const server = express();
+// This middleware needs to know about the server.  The middleware we create, we are going to
+// move into the middleware.js file  
+const setupMiddleware = require('./setup/middleware')(server);
 
 mongoose
   .connect('mongodb://localhost/auth')
@@ -14,11 +16,6 @@ mongoose
   .catch(err => {
     console.log('\n=== ERROR connecting to mongo ===\n');
   });
-
-server.use(helmet());
-server.use(morgan('dev'));
-server.use(express.json());
-server.use(cors());
 
 server.get('/', function(req, res) {
   res.send({ api: 'up and running' });
