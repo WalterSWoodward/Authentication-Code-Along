@@ -13,6 +13,10 @@ const userSchema = new mongoose.Schema({
         required: true,
         minLength: 4,
     },
+    race: {
+        type: String,
+        required: true
+    }
 });
 
 // Must be BEFORE you generate the model (e.g. `module.exports...etc.`)

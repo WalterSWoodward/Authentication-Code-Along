@@ -1,4 +1,5 @@
 const User = require('../users/User');
+const jwt = require('jsonwebtoken');
 
 function makeToken(user) {
     // return token
@@ -7,10 +8,12 @@ function makeToken(user) {
     const timestamp = new Date().getTime();
 
     // In here we are going to configure our Token, the way we want to sign it.
-    const jwt.sign({
-        sub: user._id,
+    // https://jwt.io/introduction/
+   return jwt.sign({
+        sub: user._id, 
         username: user.username,
         // we don't want to send the password back!
+        race: user.race
     })
 }
 
