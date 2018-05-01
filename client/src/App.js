@@ -3,6 +3,7 @@ import { Route, NavLink } from 'react-router-dom'
 
 import logo from './logo.svg';
 import './App.css';
+import Signin from './auth/Signin'
 
 class App extends Component {
   render() {
