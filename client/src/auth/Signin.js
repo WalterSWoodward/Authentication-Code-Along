@@ -4,7 +4,7 @@ import axios from 'axios';
 // This will be a class component because we have a form in here
 class Signin extends React.Component {
   state = {
-    username: 'frodo',
+    username: '',
     password: ''
   };
   render() {
@@ -56,7 +56,7 @@ class Signin extends React.Component {
         console.log('response', response.data);
       })
       .catch(err => {
-        console.log('ERROR', err);
+        console.log('ERROR: You are not authorized', err);
       });
   };
 }
