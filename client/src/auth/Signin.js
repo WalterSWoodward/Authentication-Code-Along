@@ -4,8 +4,8 @@ import axios from 'axios';
 // This will be a class component because we have a form in here
 class Signin extends React.Component {
   state = {
-    username: '',
-    password: ''
+    username: 'jack',
+    password: 'Black'
   };
   render() {
     return (
@@ -26,7 +26,6 @@ class Signin extends React.Component {
             value={this.state.password}
             onChange={this.inputHandler}
             type="password"
-            placeholder="TYPE 'Bodo' to TEST"
           />
         </div>
         <div className="form-row">
@@ -53,7 +52,9 @@ class Signin extends React.Component {
     axios
       .post('http://localhost:5000/api/login', this.state)
       .then(response => {
-        console.log('response', response.data);
+        console.log('response from c.l in Signin.js:', response.data);
+        console.log(this.props);
+        this.props.onSignin(response.data);
       })
       .catch(err => {
         console.log('ERROR: You are not authorized', err);
