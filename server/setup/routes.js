@@ -56,23 +56,27 @@ const localStrategy = new LocalStrategy(function(username, password, done) {
       }
       return done(null, false);
 
-    // use strategies
-    passport.use(localStrategy);
+      // use strategies
+      passport.use(localStrategy);
 
-    // From passport-local docs -- notice .use is combined while we split it up above, then pass into as a variable
-    // passport.use(new LocalStrategy(
-    //     function(username, password, done) {
-    //       User.findOne({ username: username }, function (err, user) {
-    //         if (err) { return done(err); }
-    //         if (!user) { return done(null, false); }
-    //         if (!user.verifyPassword(password)) { return done(null, false); }
-    //         return done(null, user);
-    //       });
-    //     }
-    //   ));
+      // From passport-local docs -- notice .use is combined while we split it up above, then pass into as a variable
+      // passport.use(new LocalStrategy(
+      //     function(username, password, done) {
+      //       User.findOne({ username: username }, function (err, user) {
+      //         if (err) { return done(err); }
+      //         if (!user) { return done(null, false); }
+      //         if (!user.verifyPassword(password)) { return done(null, false); }
+      //         return done(null, user);
+      //       });
+      //     }
+      //   ));
     });
   });
 });
+
+// generate the passport middleware
+// passport by default uses sessions, so you need to turn them off
+const authenticate = passport.authenticate('local', { session: false }); // see passport docs `Authenticate Requests`
 
 module.exports = function(server) {
   server.get('/', function(req, res) {
@@ -90,7 +94,7 @@ module.exports = function(server) {
     });
   });
 
-  server.post('/api/login', (req, res) => {
+  server.post('/api/login', authenticate, (req, res) => {
     // find user using the creds from the body
     // check the verify password with what we have stored
     // if condition passes, then issue token to user - which will enable them to access resources
