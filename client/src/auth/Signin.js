@@ -55,6 +55,7 @@ class Signin extends React.Component {
         console.log('response from c.l in Signin.js:', response.data);
         console.log(this.props);
         this.props.onSignin(response.data);
+        this.props.history.push('/hobbits');
       })
       .catch(err => {
         console.log('ERROR: You are not authorized', err);
