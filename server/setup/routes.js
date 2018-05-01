@@ -1,6 +1,6 @@
 // Libraries
 const jwt = require('jsonwebtoken'); // https://www.npmjs.com/package/jsonwebtoken
-
+// passport has like 'plugins' to extend functionality -- we are using passport-local, which is one of these 'plugins'
 const passport = require('passport'); // https://www.npmjs.com/package/passport
 // Will use this to generate middleware
 const LocalStrategy = require('passport-local'); // https://www.npmjs.com/package/passport-local
@@ -39,10 +39,11 @@ const localStrategy = new LocalStrategy(function(username, password, done) {
     if (err) {
       done(err);
     }
+    // if username does not exist, it is probably an attacker,
     if (!user) {
       // If I don't find the user, I will assume that we were not able to validate
       // their credentials.
-      // null-- as in 'no errors'
+      // null-- as in 'no errors'...???
       done(null, false);
     }
     // If you successfully get into here, then password IS valid, thus the user CAN be authenticated
@@ -52,12 +53,9 @@ const localStrategy = new LocalStrategy(function(username, password, done) {
       }
       if (isValid) {
         const { _id, username, race } = user;
-        return done(null, { _id, username, race }); // placed on req
+        return done(null, { _id, username, race }); // placed on req.user
       }
       return done(null, false);
-
-      // use strategies
-      passport.use(localStrategy);
 
       // From passport-local docs -- notice .use is combined while we split it up above, then pass into as a variable
       // passport.use(new LocalStrategy(
@@ -74,8 +72,11 @@ const localStrategy = new LocalStrategy(function(username, password, done) {
   });
 });
 
+// use strategies
+passport.use(localStrategy);
+
 // generate the passport middleware
-// passport by default uses sessions, so you need to turn them off
+// passport by default uses sessions, so you need to turn them off.  We are going to use jwt
 const authenticate = passport.authenticate('local', { session: false }); // see passport docs `Authenticate Requests`
 
 module.exports = function(server) {
@@ -98,5 +99,7 @@ module.exports = function(server) {
     // find user using the creds from the body
     // check the verify password with what we have stored
     // if condition passes, then issue token to user - which will enable them to access resources
+    // if we are here, then all of the above has been done, and the user has been authenticated, and so we return them the token
+    res.json({ token: makeToken(req.user), user: req.user });
   });
 };
