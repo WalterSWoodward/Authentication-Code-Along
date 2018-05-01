@@ -28,7 +28,6 @@ module.exports = function(server) {
     res.send({ api: 'up and running' });
   });
 
-  //
   server.post('/api/register', function(req, res) {
     // grabs username and password from Body
     const credentials = req.body;
@@ -39,4 +38,10 @@ module.exports = function(server) {
       res.status(201).json({ token });
     });
   });
+
+  server.post('/api/login', (req, res) => {
+      // find user using the creds from the body
+      // check the verify password with what we have stored
+      // if condition passes, then issue token to user - which will enable them to access resources
+  })
 };

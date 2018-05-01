@@ -36,6 +36,15 @@ userSchema.pre('save', function (next) {
     })
 })
 
+// Should compare the password with input and let us know if it isValid  or not
+userSchema.methods.verifyPassword = function(guess, callback) {
+    bcrypt.compare(guess, this.password, function(err, isValid) {
+        if(err) {return callback(err)}
+        // here there was no error
+        callback(null, isValid)
+    })
+}
+
 // Regular function usage EXAMPLE [also works]:
 // userSchema.pre('save', function (next) {
 //     const user = this;
