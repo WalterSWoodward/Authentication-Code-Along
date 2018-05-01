@@ -5,17 +5,23 @@ const passport = require('passport'); // https://www.npmjs.com/package/passport
 // Will use this to generate middleware
 const LocalStrategy = require('passport-local'); // https://www.npmjs.com/package/passport-local
 
+// https://www.npmjs.com/package/passport-jwt
+// We use this to teach passport how to grab the token and read it from the header
+const { ExtractJwt } = require('passport-jwt');
+// ???
+const JwtStrategy = require('passport-jwt').Strategy;
+
 // User.js with userSchema, bcrypt hashing, and bycrypt password compare
 const User = require('../users/User');
+const secret = 'no size limit on tokens';
 
-// token
 function makeToken(user) {
   // return token
   // sub: subject (id)
   // Time stamp so we know when the document was created and when it will expire.
   const timestamp = new Date().getTime();
   const payload = {
-    // sub: subject (id) who the token is about
+    // sub: subject (id) who the token is about -- using _id, since this is a part of the industry standard
     sub: user._id,
     username: user.username,
     // we don't want to send the password back!
@@ -23,7 +29,6 @@ function makeToken(user) {
     // "issued at time"
     iat: timestamp
   };
-  const secret = 'no size limit on tokens';
   const options = { expiresIn: '4h' };
   // In here we are going to configure our Token, the way we want to sign it.
   // https://jwt.io/introduction/
@@ -72,14 +77,69 @@ const localStrategy = new LocalStrategy(function(username, password, done) {
   });
 });
 
+const jwtOptions = {
+  // This is an industry standard
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  // remember that we encrypted using the secret, and now we decrypt it using the secret
+  // solved `TypeError: JwtStrategy requires a secret or key` by reading passport-jwt docs
+  // finding that this option is not `secret`, but `secretOrKey`
+  secretOrKey: secret
+};
+
+const jwtStrategy = new JwtStrategy(jwtOptions, function(payload, done) {
+  User.findById(payload.sub)
+    // use select() to pass ONLY username and race NOT password,
+    // .select('-password') also works, and is prob a bit better
+    .select('username race')
+    .then(user => {
+      // In the real world, you would do a lot more checks here -- making sure the user was in
+      // the correct department, had the correct clearance, was still an active employee etc.
+      if (user) {
+        // if I am in here then I have found the user, everything is fine,
+        // the token is good, nobody tampered with it
+        // "passing null because there is no error"
+        done(null, user);
+      } else {
+        // if I am here, that tells us that the user does not exist/is no longer there, even
+        // though we HAVE already verified that the token is valid.
+        // So we call a done() here, there is no error (e.g. "null"), but the program is not
+        // allowed to proceed (e.g. "false")
+        done(null, false);
+      }
+    })
+    .catch(err => {
+      // handle
+      return done(err, false);
+    });
+});
+
 // use strategies
 passport.use(localStrategy);
+passport.use(jwtStrategy);
 
 // generate the passport middleware
 // passport by default uses sessions, so you need to turn them off.  We are going to use jwt
 const authenticate = passport.authenticate('local', { session: false }); // see passport docs `Authenticate Requests`
+// wrote this after finishing jwtStrategy, "this protects the routes"
+// QUESTION: So this looks for any code with 'jwt' and runs it???
+const protected = passport.authenticate('jwt', { session: false });
 
 module.exports = function(server) {
+  // To check this you must have at least one user with "race": "hobbit" registered using [post] / register.
+  // Then go to the URL below in Postman and instead of going to Body, click on header and create a new
+  // key value pair where key = Authorization, and the value = "Bear <token>"
+  server.get('/api/hobbits', protected, (req, res) => {
+    // if you are here, you will receive a list of the hobbits
+    User.find({ race: 'hobbit' })
+      .select('-password')
+      .then(hobbits => {
+        res.json(hobbits);
+      })
+      .catch(err => {
+        res.status(500).json(err);
+      });
+  });
+
   server.get('/', function(req, res) {
     res.send({ api: 'up and running' });
   });
