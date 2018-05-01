@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 
 // This will be a class component because we have a form in here
 class Signin extends React.Component {
@@ -8,7 +9,7 @@ class Signin extends React.Component {
   };
   render() {
     return (
-      <form className="form">
+      <form onSubmit={this.submitHandler} className="form">
         <div className="form-row">
           <label>Username</label>
           <input
@@ -25,6 +26,7 @@ class Signin extends React.Component {
             value={this.state.password}
             onChange={this.inputHandler}
             type="password"
+            placeholder="TYPE 'Bodo' to TEST"
           />
         </div>
         <div className="form-row">
@@ -42,7 +44,20 @@ class Signin extends React.Component {
     // Here we are looking for the name property (see above), so that when the onChange fires, we will get
     // the event/target.  QUESTION: How does this work???
     this.setState({ [name]: value });
-    console.log(this.state);
+    // console.log(this.state);
+  };
+
+  submitHandler = event => {
+    event.preventDefault();
+
+    axios
+      .post('http://localhost:5000/api/login', this.state)
+      .then(response => {
+        console.log('response', response.data);
+      })
+      .catch(err => {
+        console.log('ERROR', err);
+      });
   };
 }
 

@@ -40,6 +40,7 @@ function makeToken(user) {
 // `done` here is kind of like `next`
 // this is all 'callback' syntax, versus `promise` syntax (then, catch) or `async`
 const localStrategy = new LocalStrategy(function(username, password, done) {
+    // console.log('USERNAME+PASSWORD', username, password) -- WORKS! Getting the correct username and password when `Sign In` is clicked
   User.findOne({ username }, function(err, user) {
     if (err) {
       done(err);
